@@ -13,9 +13,10 @@ class CollegeController extends Controller {
     }
 
     public function show($id) {
-        $college = College::with('departments')->findOrFail($id);
+        $college = College::with('departments')->findOrFail($id);//error($id)
         return view('colleges.show', compact('college'));
     }
+
     public function create() {
         return view('colleges.create');
     }

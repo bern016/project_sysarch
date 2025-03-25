@@ -61,7 +61,6 @@ class DepartmentController extends Controller {
     }
     
     
-
 public function restore($id) {
     $department = Department::onlyTrashed()->findOrFail($id);
     $department->restore();

@@ -12,7 +12,11 @@ class DepartmentController extends Controller {
         $deletedDepartments = Department::onlyTrashed()->get();
         return view('departments.index', compact('departments', 'deletedDepartments'));
     }
-    
+   
+    public function create() {
+        $colleges = College::all();
+        return view('departments.create', compact('colleges'));
+    }    
 
     public function create() {
         $colleges = College::all();

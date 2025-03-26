@@ -1,58 +1,55 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mt-5">
-    <h2>College List</h2>
+<div class="container">
+    <h1>Colleges</h1>
 
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+    <!-- Search Form -->
+    <form action="{{ route('colleges.search') }}" method="GET" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="search" class="form-control" placeholder="Search by College Name or Code" value="{{ request()->input('search') }}">
+            <button class="btn btn-primary" type="submit">Search</button>
         </div>
-    @endif
+    </form>
 
-
-    <div class="mb-3 d-flex gap-2">
-        <a href="{{ route('colleges.create') }}" class="btn btn-info text-white">Add College</a>
-        <a href="{{ route('colleges.deleted') }}" class="btn btn-secondary">View Deleted Colleges</a>
-    </div>
-    
-
-    @if($colleges->count() > 0)
-        <table class="table table-bordered table-hover">
-            <thead class="table-dark">
+    <!-- College List -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>College Name</th>
+                <th>College Code</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($colleges as $college)
                 <tr>
-                    <th>ID</th>
-                    <th>College Name</th>
-                    <th>College Code</th>
-                    <th>Active</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($colleges as $college)
-                <tr class="{{ $college->deleted_at ? 'table-danger' : '' }}">
-                    <td>{{ $college->CollegeID }}</td>
                     <td>{{ $college->CollegeName }}</td>
                     <td>{{ $college->CollegeCode }}</td>
-                    <td>{{ $college->IsActive ? 'Yes' : 'No' }}</td>
+                    <td>{{ $college->IsActive ? 'Active' : 'Inactive' }}</td>
                     <td>
-                        <a href="{{ route('colleges.show', $college->CollegeID) }}" class="btn btn-info btn-sm">View Departments</a>
-                        <a href="{{ route('colleges.edit', $college->CollegeID) }}" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="{{ route('colleges.show', $college) }}" class="btn btn-info btn-sm">View</a>
+                        <a href="{{ route('colleges.edit', $college) }}" class="btn btn-warning btn-sm">Edit</a>
 
-                        <form action="{{ route('colleges.destroy', $college->CollegeID) }}" method="POST" class="d-inline">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this college?')">Delete</button>
+                        <form action="{{ route('colleges.destroy', $college) }}" method="POST" style="display:inline;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
                         </form>
                     </td>
                 </tr>
-                @endforeach
-            </tbody>
-        </table>
-    @else
-        <p class="text-muted">No colleges found.</p>
-    @endif
+            @empty
+                <tr>
+                    <td colspan="4" class="text-center">No colleges found.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-between">
+        <a href="{{ route('colleges.create') }}" class="btn btn-success">Add New College</a>
+        {{ $colleges->links() }}
+    </div>
 </div>
 @endsection

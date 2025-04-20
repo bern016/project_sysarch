@@ -1,7 +1,5 @@
 @extends('layouts.app')
 
-@section('title', 'Departments')
-
 @section('content')
 <div class="container mt-5">
     <!-- Header -->
@@ -12,9 +10,19 @@
             <a href="{{ route('departments.deleted') }}" class="btn btn-danger">View Deleted Departments</a>      
         </div>
     </div>
-    
 
+    <!-- Search and Filter Form -->
+    <form action="{{ route('departments.search') }}" method="GET" class="mb-6 flex items-center gap-4">
+    <input type="text" name="keyword" placeholder="Search..." value="{{ $keyword }}" class="border p-2 rounded w-1/3">
+    <select name="IsActive" class="border p-2 rounded">
+        <option value="">-- Filter by Status --</option>
+        <option value="1" {{ $isActive === '1' ? 'selected' : '' }}>Active</option>
+        <option value="0" {{ $isActive === '0' ? 'selected' : '' }}>Inactive</option>
+    </select>
+    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Search</button>
+</form>
 
+    <!-- Departments Table -->
     <div class="card">
         <div class="card-body">
             @if($departments->count() > 0)
@@ -60,3 +68,4 @@
     </div>
 </div>
 @endsection
+

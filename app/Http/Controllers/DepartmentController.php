@@ -7,21 +7,61 @@ use App\Models\Department;
 use App\Models\College;
 
 class DepartmentController extends Controller {
-    public function index() {
-        $departments = Department::with('college')->get(); 
-        $deletedDepartments = Department::onlyTrashed()->get();
-        return view('departments.index', compact('departments', 'deletedDepartments'));
+    public function index(Request $request)
+{
+    $keyword = $request->input('keyword', '');  // Default to an empty string if no keyword
+    $isActive = $request->input('IsActive', ''); // Default to an empty string if no status filter
+
+    // Query for departments with the optional filters
+    $query = Department::with('college');
+
+    // If there's a keyword, filter by department name or code
+    if ($keyword) {
+        $query->where(function ($q) use ($keyword) {
+            $q->where('DepartmentName', 'like', "%{$keyword}%")
+              ->orWhere('DepartmentCode', 'like', "%{$keyword}%");
+        });
     }
+
+    // If there's a status filter (active or inactive), apply it
+    if ($isActive !== '') {
+        $query->where('IsActive', $isActive);
+    }
+
+    // Fetch the filtered departments
+    $departments = $query->get();
+
+    // Return the view with departments, keyword, and status filter values
+    return view('departments.index', compact('departments', 'keyword', 'isActive'));
+}
    
     public function create() {
         $colleges = College::all();
         return view('departments.create', compact('colleges'));
     }    
 
-    public function create() {
-        $colleges = College::all();
-        return view('departments.create', compact('colleges'));
+    public function search(Request $request)
+{
+    $keyword = $request->input('keyword');
+    $isActive = $request->input('IsActive');
+
+    $query = Department::with('college');
+
+    if ($keyword) {
+        $query->where(function ($q) use ($keyword) {
+            $q->where('DepartmentName', 'like', "%{$keyword}%")
+              ->orWhere('DepartmentCode', 'like', "%{$keyword}%");
+        });
     }
+
+    if ($isActive !== null && $isActive !== '') {
+        $query->where('IsActive', $isActive);
+    }
+
+    $departments = $query->get();
+
+    return view('departments.search', compact('departments', 'keyword', 'isActive'));
+}
 
     public function store(Request $request) {
         $request->validate([
